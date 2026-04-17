@@ -5,9 +5,9 @@ from datetime import datetime
 mcp = FastMCP("season-server", host="0.0.0.0", port=8000)
 
 season_map = {
-    "summer": ["Ooty", "Manali", "Shimla"],
-    "winter": ["Goa", "Kerala"],
-    "monsoon": ["Coorg", "Munnar"]
+    "summer": ["Ooty", "Manali", "Shimla", "Coorg", "Kodaikanal", "ladakh", "gangtok"],
+    "winter": ["Goa", "Kerala", "Darjeeling", "Andaman", "Kashmir"],
+    "monsoon": ["Coorg", "Munnar", "Chikmagalur", "Wayanad"]
 }
 
 def get_season(month):
