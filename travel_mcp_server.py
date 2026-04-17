@@ -7,9 +7,18 @@ load_dotenv()
 
 mcp = FastMCP("travel-server", host="0.0.0.0", port=8001)
 
-# ✅ Only fetches weather data - no LLM
+def get_weather_api_key():
+    """Read from environment — Streamlit Cloud injects st.secrets as env vars for subprocesses."""
+    return os.getenv("OPENWEATHER_API_KEY")
+
 async def fetch_weather(city: str) -> dict:
-    api_key = os.getenv("OPENWEATHER_API_KEY")
+    api_key = get_weather_api_key()
+
+    if not api_key:
+        return {"error": "OPENWEATHER_API_KEY not set.", "city": city,
+                "description": "Unknown", "temp_c": "N/A",
+                "feels_like": "N/A", "humidity": "N/A"}
+
     url = (
         f"https://api.openweathermap.org/data/2.5/weather"
         f"?q={city}&appid={api_key}&units=metric"
@@ -17,8 +26,10 @@ async def fetch_weather(city: str) -> dict:
     async with httpx.AsyncClient() as http:
         res = await http.get(url)
         if res.status_code != 200:
-            return {"error": "Weather data unavailable."}
-        
+            return {"error": "Weather data unavailable.", "city": city,
+                    "description": "Unavailable", "temp_c": "N/A",
+                    "feels_like": "N/A", "humidity": "N/A"}
+
         data = res.json()
         return {
             "city"       : city,
@@ -30,12 +41,8 @@ async def fetch_weather(city: str) -> dict:
 
 @mcp.tool()
 async def plan_trip(city: str):
-    """
-    Returns raw weather data for the given city.
-    """
-    weather_data = await fetch_weather(city)
-    # ✅ Just return raw data — NO LLM here
-    return weather_data
+    """Returns raw weather data for the given city. No LLM — data only."""
+    return await fetch_weather(city)
 
 if __name__ == "__main__":
     mcp.run(transport="sse")
