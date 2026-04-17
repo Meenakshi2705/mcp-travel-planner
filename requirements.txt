@@ -1,0 +1,7 @@
+streamlit
+mcp
+groq
+httpx
+python-dotenv
+nest_asyncio
+uvicorn
